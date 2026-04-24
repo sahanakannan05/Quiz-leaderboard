@@ -4,15 +4,45 @@ A Java solution for the Bajaj Finserv Health Internship Assignment — SRM Quiz 
 
 ## Problem Summary
 
-Poll a quiz API 10 times, deduplicate event data using `roundId + participant` as a composite key, aggregate scores per participant, and submit a final sorted leaderboard.
+Polls a quiz API 10 times, removes duplicate entries, aggregates each participant's score, and submits a sorted leaderboard.
 
-## How It Works
+## Prerequisites
 
-1. **Poll** — Calls `GET /quiz/messages?regNo=<REG>&poll=<0-9>` ten times with a mandatory 5-second delay between each call.
-2. **Deduplicate** — Tracks every `roundId::participant` pair in a `HashSet`. Any event already seen is skipped to avoid double-counting.
-3. **Aggregate** — Accumulates scores per participant in a `Map<String, Integer>`.
-4. **Sort** — Builds a leaderboard sorted by `totalScore` in descending order.
-5. **Submit** — Posts the final leaderboard once to `POST /quiz/submit`.
+- Java 11+
+- Maven 3.6+
+
+## Setup & Run
+
+### 1. Clone the repo
+
+1. Clone the repo
+2. Open `QuizLeaderboard.java` and set your registration number on line 14
+replace:
+
+private static final String REG_NO = "YOUR_REG_NO_HERE";
+
+with your actual registration number, e.g. `"RA2311053010140"`.
+3. Build:
+
+```bash
+mvn clean package
+```
+
+4. Run
+
+```bash
+java -jar target/quiz-leaderboard.jar
+```
+
+The program will print each poll response, flag duplicates, and finally print the leaderboard and the server's submission response.
+
+## Logic used
+- Called the API 10 times with poll values 0 to 9
+- Used a HashSet to track roundId + participant combinations already seen
+- If the same combination appeared again in a later poll, it was skipped
+- Scores were added up per participant using a HashMap
+- Final leaderboard sorted by total score in descending order
+- Submitted once after all polls completed
 
 ## Project Structure
 
@@ -27,53 +57,20 @@ quiz-leaderboard/
                 └── quiz/
                     └── QuizLeaderboard.java
 ```
+## How It Works
 
-## Prerequisites
-
-- Java 11+
-- Maven 3.6+
-
-## Setup & Run
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/quiz-leaderboard.git
-cd quiz-leaderboard
-```
-
-### 2. Set your registration number
-
-Open `src/main/java/com/quiz/QuizLeaderboard.java` and replace:
-
-```java
-private static final String REG_NO = "YOUR_REG_NO_HERE";
-```
-
-with your actual registration number, e.g. `"2024CS101"`.
-
-### 3. Build
-
-```bash
-mvn clean package
-```
-
-### 4. Run
-
-```bash
-java -jar target/quiz-leaderboard.jar
-```
-
-The program will print each poll response, flag duplicates, and finally print the leaderboard and the server's submission response.
+1. Poll — Calls with ten times with a mandatory 5-second delay between each call.
+2. Deduplicate — Tracks every roundId::participant pair in a HashSet. Any event already seen is skipped to avoid double counting.
+3. Aggregate — Accumulates scores per participant 
+4. Sort — Builds a leaderboard sorted by totalScore in descending order.
+5. Submit — Posts the final leaderboard once to POST /quiz/submit.
 
 ## Key Design Decisions
 
-| Challenge | Solution |
-|---|---|
-| Duplicate API responses | `HashSet<String>` keyed on `roundId::participant` |
-| Score aggregation | `Map.merge(key, score, Integer::sum)` |
-| Leaderboard ordering | `List.sort()` with descending comparator |
-| Single submission | Submit called exactly once after all polls complete |
+| Duplicate API responses - HashSet<String> keyed on roundId::participant |
+| Score aggregation |
+| Leaderboard ordering - List.sort() with descending comparator |
+| Single submission - Submit called exactly once after all polls complete |
 
 ## Dependencies
 
