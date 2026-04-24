@@ -1,5 +1,6 @@
 # Quiz Leaderboard System
 
+A Java solution for the Bajaj Finserv Health Internship Assignment - SRM Quiz Leaderboard.
 
 ## Problem Summary
 
